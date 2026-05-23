@@ -1,37 +1,64 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メモ</title>
-    <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,
-        %3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23000000' viewBox='0 0 256 256'%3E%3Cpath d='M248,92.68a15.86,15.86,0,0,0-4.69-11.31L174.63,12.68a16,16,0,0,0-22.63,0L123.57,41.11l-58,21.77A16.06,16.06,0,0,0,55.35,75.23L32.11,214.68A8,8,0,0,0,40,224a8.4,8.4,0,0,0,1.32-.11l139.44-23.24a16,16,0,0,0,12.35-10.17l21.77-58L243.31,104A15.87,15.87,0,0,0,248,92.68Zm-69.87,92.19L63.32,204l47.37-47.37a28,28,0,1,0-11.32-11.32L52,192.7,71.13,77.86,126,57.29,198.7,130ZM112,132a12,12,0,1,1,12,12A12,12,0,0,1,112,132Zm96-15.32L139.31,48l24-24L232,92.68Z'%3E%3C/path%3E%3C/svg%3E
-        " 
-    />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23000000' viewBox='0 0 256 256'%3E%3Cstyle%3Epath%7Bfill:%23000000%3B%7D@media (prefers-color-scheme: dark)%7Bpath%7Bfill:%23ffffff%3B%7D%7D%3C/style%3E%3Cpath d='M243.31,81.36,174.63,12.68a16,16,0,0,0-22.63,0L123.56,41.12l-58,21.76A16,16,0,0,0,55.36,75.23L34.59,199.83a4,4,0,0,0,6.77,3.49l57-57a23.85,23.85,0,0,1-2.29-12.08,24,24,0,1,1,13.6,23.4l-57,57a4,4,0,0,0,3.49,6.77l124.61-20.77a16,16,0,0,0,12.35-10.16l21.77-58.07L243.31,104a16,16,0,0,0,0-22.63ZM208,116.68,139.32,48l24-24L232,92.68Z'%3E%3C/path%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gen-interface-jp@0.5.0/cdn/all.css" />
 
     <style>
-        body, html {
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #101828;
+            --counter-text: #667085;
+            --selection-bg: #00bba7;
+            --selection-text: #ffffff;
+            --placeholder-color: #98a2b3;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f1013;
+                --text-color: #f4f5f6;
+                --counter-text: #98a2b3;
+                --placeholder-color: #475467;
+            }
+        }
+
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
-            background-color: #f9fafb;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "Gen Interface JP", -apple-system, BlinkMacSystemFont, Inter, "Hiragino Kaku Gothic Pro", "Noto Sans JP", "BIZ UDPGothic", sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         textarea {
             width: 100%;
             height: 100%;
             border: none;
-            padding: 128px; 
+            padding: 128px;
             box-sizing: border-box;
-            font-size: 18px;
+            font-size: 24px;
             line-height: 1.8;
-            font-family: -apple-system, BlinkMacSystemFont, Inter, "Hiragino Kaku Gothic Pro", "Noto Sans JP", "BIZ UDPGothic", sans-serif;
-            color: #000;
-            background-color: #f9fafb;
+            font-family: inherit;
+            color: inherit;
+            background-color: transparent;
             outline: none;
             resize: none;
+            transition: padding 0.3s ease;
+        }
+
+        textarea::placeholder {
+            color: var(--placeholder-color);
         }
 
         #counter {
@@ -39,12 +66,11 @@
             bottom: 16px;
             left: 16px;
             font-size: 14px;
-            color: #667085;
-            background: rgba(249, 250, 251, 0.8);
+            color: var(--counter-text);
             padding: 8px 12px;
-            border-radius: 6px;
             line-height: 1.5;
             user-select: text;
+            transition: color 0.3s ease;
         }
 
         /* 数字部分をモノスペースにするスタイル */
@@ -55,8 +81,8 @@
         }
 
         ::selection {
-            color: #fff;
-            background-color: #00bba7;
+            color: var(--selection-text);
+            background-color: var(--selection-bg);
         }
 
         @media (max-width: 600px) {
@@ -67,10 +93,11 @@
         }
     </style>
 </head>
+
 <body>
 
     <textarea id="memo" placeholder="文字を入力..."></textarea>
-    
+
     <div id="counter">
         <div id="line-display"><span id="line-count" class="num">0</span>行</div>
         <div id="char-display"><span id="char-count" class="num">0</span>文字</div>
@@ -80,21 +107,21 @@
         const memoArea = document.getElementById('memo');
         const charCountEl = document.getElementById('char-count');
         const lineCountEl = document.getElementById('line-count');
-        
+
         // Intl.Segmenterの初期化（日本語/書記素単位）
         const segmenter = new Intl.Segmenter('ja', { granularity: 'grapheme' });
 
         const updateCounter = () => {
             const text = memoArea.value;
-            
+
             // 1. 改行を除去して文字数をカウント
             const textWithoutNav = text.replace(/\n/g, "");
             const segments = segmenter.segment(textWithoutNav);
             const charCount = Array.from(segments).length;
-            
+
             // 2. 行数カウント
             const lineCount = text === "" ? 0 : text.split('\n').length;
-            
+
             // 3. textContentで数値を更新
             charCountEl.textContent = charCount;
             lineCountEl.textContent = lineCount;
@@ -112,4 +139,5 @@
         });
     </script>
 </body>
+
 </html>
